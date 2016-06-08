@@ -1,0 +1,30 @@
+{
+  "name": "material-design-icons-svg",
+  "version": "1.0.0",
+  "description": "Material design icons",
+  "scripts": {
+    "prepublish": "node download.js"
+  },
+  "keywords": [
+    "material design icons",
+    "material design",
+    "icons",
+    "icon",
+    "svg",
+    "mdi"
+  ],
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {},
+  "author": "Marc Bachmann <marc.brookman@gmail.com>",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/marcbachmann/material-design-icons-svg.git"
+  },
+  "bugs": {
+    "url": "https://github.com/marcbachmann/material-design-icons-svg/issues"
+  },
+  "homepage": "https://github.com/marcbachmann/material-design-icons-svg#readme",
+  "files": ["index.js", "paths.json"]
+}
