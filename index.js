@@ -1,9 +1,10 @@
 module.exports = function icons (paths, prefix) {
-  function initialize (names) {
-    if (typeof window === 'undefined') throw new Error('Initialize is only supported in browsers.')
-    var div = document.createElement('div')
-    div.innerHtml = getSymbols(names)
-    document.body.appendChild(div.firstChild)
+  function initialize (host, names) {
+    if (typeof host === 'undefined') throw new Error('A host-dom element is required. Initialize is only supported in browsers.')
+    var doc = host.ownerDocument
+    var div = doc.createElement('div')
+    div.innerHTML = getSymbols(names)
+    host.appendChild(div.firstChild)
   }
 
   function getSVG (name, attributes) {

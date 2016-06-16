@@ -26,7 +26,7 @@ $(document.body).append(svg)
 // OR if you care about performance
 
 // You can load icons using the `<use>` notation.
-icons.initialize() // Appends all icons to document.body
+icons.initialize(document.body) // Appends all icons to document.body
 var icon = icons.getIcon('access-point')
 // returns reference to initialized svg
 // <svg>
