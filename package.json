@@ -1,6 +1,6 @@
 {
   "name": "material-design-icons-svg",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Material design icons",
   "scripts": {
     "prepublish": "node download.js"
@@ -26,5 +26,8 @@
     "url": "https://github.com/marcbachmann/material-design-icons-svg/issues"
   },
   "homepage": "https://github.com/marcbachmann/material-design-icons-svg#readme",
-  "files": ["index.js", "paths.json"]
+  "files": [
+    "index.js",
+    "paths.json"
+  ]
 }
