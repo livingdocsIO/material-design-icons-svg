@@ -8,9 +8,9 @@ module.exports = function icons (paths, prefix) {
   }
 
   function getSVG (name, attributes) {
+    if (typeof paths[name] !== 'string') return
     var path = paths[name]
-    if (!path) return
-    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"'+ (attributes || '') +'><path d="' + path + '" /></svg>'
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"'+ (attributes || '') +'>' + getPath(path) + '</svg>'
   }
 
   function getSymbols (names) {
@@ -33,11 +33,18 @@ module.exports = function icons (paths, prefix) {
   }
 }
 
+function getPath (path) {
+  path = path.trim()
+  if (/^<svg/.test(path)) return path
+  if (/^<path/.test(path)) return path
+  return '<path d="' + path + '" />'
+}
+
 function toSymbol (name, path, prefix) {
   if (!path) return
   var id = prefix? prefix + '-' + name : name
   return '<symbol id="' + id + '" viewBox="0 0 24 24">' +
     '<title>' + name + '</title>' +
-    '<path d="' + path + '" />' +
+    getPath(path) +
   '</symbol>'
 }
