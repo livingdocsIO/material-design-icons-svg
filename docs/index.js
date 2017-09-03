@@ -1,9 +1,13 @@
 const paths = require('../paths')
+const iconNames = Object.keys(paths)
+const iconSearch = require('simple-text-search')(iconNames)
 const icons = require('../index')(paths, 'vendor-prefix')
+const debounce = require('lodash.debounce')
+
 
 function toIcon (name) {
   return `
-    <div class="icon">
+    <div class="icon" name="${name}">
       ${icons.getIcon(name, `title="${name}"`)}
       <label>${name}</label>
     </div>
@@ -11,7 +15,7 @@ function toIcon (name) {
 }
 
 const body = `
-  ${Object.keys(paths).map(toIcon).join('')}
+  ${iconNames.map(toIcon).join('')}
   ${icons.getSymbols()}
 `
 
@@ -20,13 +24,31 @@ if (typeof window !== 'undefined') {
   window.document.addEventListener('DOMContentLoaded', attach)
 
   function attach () {
+    const search = document.createElement('div')
+    search.className = 'panel'
+    search.innerHTML = '<input class="search" type="text" placeholder="Search for some icons...">'
+
     const wrapper = document.createElement('div')
     wrapper.className = 'icons'
     wrapper.innerHTML = body
 
+    document.body.appendChild(search)
     document.body.appendChild(wrapper)
 
-    document.body.addEventListener('click', function (evt) {
+    search.querySelector('input').addEventListener('keyup', debounce(function (evt) {
+      console.log(evt.target.value)
+      wrapper.querySelectorAll('.icon').forEach(function (icon) {
+        icon.className = icon.className = 'icon hide'
+      })
+
+      const results = iconSearch(evt.target.value)
+      results.forEach(function (iconName) {
+        const icon = wrapper.querySelector(`[name=${iconName}]`)
+        if (icon) icon.className = 'icon'
+      })
+    }), 100)
+
+    wrapper.addEventListener('click', function (evt) {
       try {
         var success = document.execCommand('copy')
         var name = window.getSelection().baseNode.data
