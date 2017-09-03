@@ -3,7 +3,7 @@
   "version": "1.0.1",
   "description": "Material design icons",
   "scripts": {
-    "prepublish": "node download.js"
+    "download": "rm -Rf paths.json ./paths && node download.js"
   },
   "keywords": [
     "material design icons",

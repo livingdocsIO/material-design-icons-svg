@@ -5,9 +5,10 @@ process.on('exit', function () {
   clearInterval(interval)
 })
 
-var https = require('https')
-var fs = require('fs')
-var join = require('path').join
+const writeFile = require('util').promisify(require('fs').writeFile)
+const https = require('https')
+const fs = require('fs')
+const join = require('path').join
 
 function getMdiApi(path, cb) {
   return https.get({
@@ -31,18 +32,24 @@ function getMdiApi(path, cb) {
   })
 }
 
-getMdiApi('/init', function (init) {
-  var mainPackageId = init.packages[0].id
-  getMdiApi('/package/' + mainPackageId, function(data) {
-    var paths = data.icons.reduce(function (all, icon) {
-      all[icon.name] = icon.data
-      return all
-    }, {})
+fs.mkdir('./paths', function (err) {
+  if (err && err.code !== 'EEXIST') throw err
 
-    var json = JSON.stringify(paths)
-    fs.writeFile(join(__dirname, 'paths.json'), json, function (err) {
-      if (err) throw err
-      process.exit(0)
+  getMdiApi('/init', function (init) {
+    var mainPackageId = init.packages[0].id
+    getMdiApi('/package/' + mainPackageId, function(data) {
+      var paths = data.icons.reduce(function (all, icon) {
+        all[icon.name] = icon.data
+        return all
+      }, {})
+
+      var json = JSON.stringify(paths)
+      fs.writeFile(join(__dirname, 'paths.json'), json, function (err) {
+        if (err) throw err
+
+        const promises = data.icons.map((icon) => writeFile(join(__dirname, 'paths', `${icon.name}.json`), `"${icon.data}"`))
+        Promise.all(promises).then(() => process.exit(0))
+      })
     })
   })
 })
