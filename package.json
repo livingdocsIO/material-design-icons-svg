@@ -1,6 +1,6 @@
 {
   "name": "material-design-icons-svg",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Material design icons svgs from materialdesignicons.com",
   "scripts": {
     "download": "rm -Rf paths.json ./paths && node download.js"
