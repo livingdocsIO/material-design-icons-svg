@@ -1,0 +1,16 @@
+{
+  "name": "material-design-icons-svg-example",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "budo index.js:bundle.js",
+    "build": "browserify index.js > bundle.js"
+  },
+  "author": "Marc Bachmann <marc.brookman@gmail.com>",
+  "license": "ISC",
+  "dependencies": {
+    "browserify": "^14.4.0",
+    "budo": "^10.0.4"
+  }
+}
