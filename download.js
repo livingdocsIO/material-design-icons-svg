@@ -39,6 +39,7 @@ fs.mkdir('./paths', function (err) {
     var mainPackageId = init.packages[0].id
     getMdiApi('/package/' + mainPackageId, function(data) {
       var paths = data.icons.reduce(function (all, icon) {
+        if (icon.name === 'package') icon.name = 'package-regular'
         all[icon.name] = icon.data
         return all
       }, {})
@@ -47,7 +48,7 @@ fs.mkdir('./paths', function (err) {
       fs.writeFile(join(__dirname, 'paths.json'), json, function (err) {
         if (err) throw err
 
-        const promises = data.icons.map((icon) => writeFile(join(__dirname, 'paths', `${icon.name}.json`), `"${icon.data}"`))
+        const promises = Object.keys(paths).map((icon) => writeFile(join(__dirname, 'paths', `${icon}.json`), `"${paths[icon]}"`))
         Promise.all(promises).then(() => process.exit(0))
       })
     })

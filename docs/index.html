@@ -12,8 +12,11 @@
         padding: 3em;
         font: 15px/1.4 'Helvetica Neue';
         font-weight: 300;
-        -webkit-user-select: none;
         background: #eeeded;
+        user-select: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
       }
 
       .panel {
@@ -47,7 +50,6 @@
         text-align: center;
         color: rgba(0, 0, 0, .5);
         transition: color 300ms;
-        -webkit-user-select: all;
       }
 
       .icon.hide {
@@ -56,6 +58,10 @@
 
       .icon:hover {
         color: rgb(4, 0, 128);
+      }
+
+      .icon > * {
+        pointer-events: none;
       }
 
       .icon svg {
@@ -67,11 +73,16 @@
         padding: 0 15px;
       }
 
-      label {
-        overflow: hidden;
-        white-space: nowrap;
+      .icon input {
         display: block;
-        font-size: 11px;
+        width: 100%;
+        outline: none;
+        border: 0;
+        text-align: center;
+        margin-top: -13px;
+        padding: 0;
+        background: none;
+        color: rgba(0, 0, 0, .6);
       }
     </style>
 </head>

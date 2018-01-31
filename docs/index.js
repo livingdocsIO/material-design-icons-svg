@@ -4,12 +4,11 @@ const iconSearch = require('simple-text-search')(iconNames)
 const icons = require('../index')(paths, 'vendor-prefix')
 const debounce = require('lodash.debounce')
 
-
 function toIcon (name) {
   return `
     <div class="icon" name="${name}">
       ${icons.getIcon(name, `title="${name}"`)}
-      <label>${name}</label>
+      <input type="text" value="${name}" autocorrect="false" spellcheck="false"/>
     </div>
   `
 }
@@ -49,10 +48,15 @@ if (typeof window !== 'undefined') {
     }), 100)
 
     wrapper.addEventListener('click', function (evt) {
+      if (!evt.target || evt.target.className !== 'icon') return
+
+      const el = evt.target.querySelector('input')
+      const name = el.value
+      el.select()
+
       try {
-        var success = document.execCommand('copy')
-        var name = window.getSelection().baseNode.data
-        console.log(`Copied the icon ${name} into the clipboard`)
+        document.execCommand('copy')
+        console.log(`Copied the icon '${name}' into the clipboard`)
       } catch (err) {
         return console.error('Copy is not supported', err)
       }
