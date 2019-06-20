@@ -3,7 +3,7 @@
   "version": "2.0.0",
   "description": "Material design icons svgs from materialdesignicons.com",
   "scripts": {
-    "download": "rm -Rf paths.json ./paths && node download.js && mv paths/package.json paths/package-regular.json"
+    "download": "rm -Rf paths.json ./paths && node download.js"
   },
   "keywords": [
     "material-design-icons",
