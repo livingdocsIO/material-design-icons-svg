@@ -1,0 +1,23 @@
+---
+kind: pipeline
+name: default
+
+clone:
+  depth: 50
+
+steps:
+- name: release
+  image: livingdocs/semantic-release:v1.0.0
+  environment:
+    GH_TOKEN:
+      from_secret: GH_TOKEN
+    NPM_TOKEN:
+      from_secret: NPM_TOKEN
+
+trigger:
+  event: [push]
+---
+kind: signature
+hmac: acce48d77ffe1763c69f478318a2a00aa78dbb7fc29e3f15fee8e1ecc4b82e9d
+
+...
