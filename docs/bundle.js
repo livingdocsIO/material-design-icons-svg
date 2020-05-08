@@ -1,13 +1,12 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 const paths = require('../paths')
 const iconNames = Object.keys(paths)
-const iconSearch = require('simple-text-search')(iconNames)
 const icons = require('../index')(paths, 'vendor-prefix')
 const debounce = require('lodash.debounce')
 
 function toIcon (name) {
   return `
-    <div class="icon" name="${name}">
+    <div class="icon show" name="${name}">
       ${icons.getIcon(name, `title="${name}"`)}
       <input type="text" value="${name}" autocorrect="false" spellcheck="false"/>
     </div>
@@ -19,50 +18,56 @@ const body = `
   ${icons.getSymbols()}
 `
 
+function attach () {
+  const search = document.createElement('div')
+  search.className = 'panel'
+  search.innerHTML = '<input class="search" type="text" placeholder="Search for some icons...">'
+
+  const wrapper = document.createElement('div')
+  wrapper.className = 'icons'
+  wrapper.innerHTML = body
+
+  document.body.appendChild(search)
+  document.body.appendChild(wrapper)
+
+  const icons = [...wrapper.querySelectorAll('.icon')].map((element) => ({
+    name: element.attributes.name.value,
+    element
+  }))
+
+  const iconSearch = require('simple-text-search')(icons, 'name')
+  search.querySelector('input').addEventListener('keyup', debounce(function (evt) {
+    if (!evt.target.value) {
+      for (const { element } of iconSearch()) element.className = 'icon show'
+      return
+    }
+
+    for (const { element } of iconSearch()) element.className = 'icon'
+
+    for (const {element} of iconSearch(evt.target.value)) {
+      element.className = 'icon show'
+    }
+  }), 100)
+
+  wrapper.addEventListener('click', function (evt) {
+    if (!evt.target || evt.target.className !== 'icon') return
+
+    const el = evt.target.querySelector('input')
+    const name = el.value
+    el.select()
+
+    try {
+      document.execCommand('copy')
+      console.log(`Copied the icon '${name}' into the clipboard`)
+    } catch (err) {
+      return console.error('Copy is not supported', err)
+    }
+  })
+}
+
 if (typeof window !== 'undefined') {
   if (window.document && window.document.body) attach()
   window.document.addEventListener('DOMContentLoaded', attach)
-
-  function attach () {
-    const search = document.createElement('div')
-    search.className = 'panel'
-    search.innerHTML = '<input class="search" type="text" placeholder="Search for some icons...">'
-
-    const wrapper = document.createElement('div')
-    wrapper.className = 'icons'
-    wrapper.innerHTML = body
-
-    document.body.appendChild(search)
-    document.body.appendChild(wrapper)
-
-    search.querySelector('input').addEventListener('keyup', debounce(function (evt) {
-      console.log(evt.target.value)
-      wrapper.querySelectorAll('.icon').forEach(function (icon) {
-        icon.className = icon.className = 'icon hide'
-      })
-
-      const results = iconSearch(evt.target.value)
-      results.forEach(function (iconName) {
-        const icon = wrapper.querySelector(`[name=${iconName}]`)
-        if (icon) icon.className = 'icon'
-      })
-    }), 100)
-
-    wrapper.addEventListener('click', function (evt) {
-      if (!evt.target || evt.target.className !== 'icon') return
-
-      const el = evt.target.querySelector('input')
-      const name = el.value
-      el.select()
-
-      try {
-        document.execCommand('copy')
-        console.log(`Copied the icon '${name}' into the clipboard`)
-      } catch (err) {
-        return console.error('Copy is not supported', err)
-      }
-    })
-  }
 }
 
 },{"../index":4,"../paths":5,"lodash.debounce":2,"simple-text-search":3}],2:[function(require,module,exports){
@@ -464,37 +469,41 @@ module.exports = prepareSimpleTextSearch
 //    // -> returns [{name: 'Marc'}]
 //  ```
 function prepareSimpleTextSearch (collection, property) {
+  let cachedPrunedElements
+
+  function * prunedElements () {
+    let i = -1
+    cachedPrunedElements = []
+    for (const elem of collection) {
+      i = i + 1
+      let val = elem
+      if (typeof property === 'string') val = val && val[property]
+      if (typeof val === 'object') val = JSON.stringify(val)
+      else if (typeof val !== 'string') continue
+      val = { pruned: clean(val), elem }
+      cachedPrunedElements[i] = val
+      yield val
+    }
+  }
+
   return function simpleTextSearch (q) {
     if (!collection || !q) return collection
-    const filter = matches(toQuery(q), property)
+    const regex = toRegex(q)
     const result = []
-    for (const elem of collection) if (filter(elem)) result.push(elem)
+    for (const { pruned, elem } of cachedPrunedElements || prunedElements()) {
+      if (regex.test(pruned)) result.push(elem)
+    }
     return result
   }
 }
 
-function toQuery (str) {
-  return clean(str)
-    .split(/\b/)
-    .filter(function (token) {
-      return /\b/.test(token)
-    })
-}
-
-function matches (query, prop) {
-  return function filter (val) {
-    if (typeof prop === 'string') val = val && val[prop]
-    if (typeof val === 'object') val = JSON.stringify(val)
-    if (typeof val !== 'string') return false
-
-    for (var i = 0; i < query.length; i++) {
-      if (!~clean(val).indexOf(query[i])) {
-        return false
-      }
-    }
-
-    return true
+function toRegex (str) {
+  const content = []
+  for (const token of clean(str).split(/\b/)) {
+    if (!/\b/.test(token)) continue
+    content.push(token.replace(/[|\\{}()[\]^$+*?.]/g, '\\$&').replace(/-/g, '\\x2d'))
   }
+  return new RegExp(`(${content.join('|')})`, 'i')
 }
 
 var replaceChar = charReplacer()
