@@ -29,22 +29,17 @@ function attach () {
   document.body.appendChild(search)
   document.body.appendChild(wrapper)
 
-  const icons = [...wrapper.querySelectorAll('.icon')].map((element) => ({
-    name: element.attributes.name.value,
-    element
-  }))
-
-  const iconSearch = require('simple-text-search')(icons, 'name')
-  search.querySelector('input').addEventListener('keyup', debounce(function (evt) {
+  const elements = [...wrapper.querySelectorAll('.icon')]
+  const entries = elements.map((e) => ({name: e.attributes.name.value, element: e}))
+  const iconSearch = require('simple-text-search')(entries, 'name')
+  let currentElements = iconSearch()
+  search.querySelector('input').addEventListener('keyup', debounce(function debouncedKeyUp (evt) {
     if (!evt.target.value) {
-      for (const { element } of iconSearch()) element.className = 'icon show'
-      return
-    }
-
-    for (const { element } of iconSearch()) element.className = 'icon'
-
-    for (const {element} of iconSearch(evt.target.value)) {
-      element.className = 'icon show'
+      for (const element of elements) element.classList.add('show')
+    } else {
+      for (const element of elements) element.classList.remove('show')
+      currentElements = [...iconSearch(evt.target.value)]
+      for (const entry of currentElements) entry.element.classList.add('show')
     }
   }), 100)
 

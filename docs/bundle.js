@@ -30,22 +30,17 @@ function attach () {
   document.body.appendChild(search)
   document.body.appendChild(wrapper)
 
-  const icons = [...wrapper.querySelectorAll('.icon')].map((element) => ({
-    name: element.attributes.name.value,
-    element
-  }))
-
-  const iconSearch = require('simple-text-search')(icons, 'name')
-  search.querySelector('input').addEventListener('keyup', debounce(function (evt) {
+  const elements = [...wrapper.querySelectorAll('.icon')]
+  const entries = elements.map((e) => ({name: e.attributes.name.value, element: e}))
+  const iconSearch = require('simple-text-search')(entries, 'name')
+  let currentElements = iconSearch()
+  search.querySelector('input').addEventListener('keyup', debounce(function debouncedKeyUp (evt) {
     if (!evt.target.value) {
-      for (const { element } of iconSearch()) element.className = 'icon show'
-      return
-    }
-
-    for (const { element } of iconSearch()) element.className = 'icon'
-
-    for (const {element} of iconSearch(evt.target.value)) {
-      element.className = 'icon show'
+      for (const element of elements) element.classList.add('show')
+    } else {
+      for (const element of elements) element.classList.remove('show')
+      currentElements = [...iconSearch(evt.target.value)]
+      for (const entry of currentElements) entry.element.classList.add('show')
     }
   }), 100)
 
@@ -488,10 +483,11 @@ function prepareSimpleTextSearch (collection, property) {
 
   return function simpleTextSearch (q) {
     if (!collection || !q) return collection
-    const regex = toRegex(q)
+    const { regex, length } = toRegex(q)
     const result = []
     for (const { pruned, elem } of cachedPrunedElements || prunedElements()) {
-      if (regex.test(pruned)) result.push(elem)
+      const match = pruned.match(regex)
+      if (match && match.length >= length) result.push(elem)
     }
     return result
   }
@@ -503,7 +499,10 @@ function toRegex (str) {
     if (!/\b/.test(token)) continue
     content.push(token.replace(/[|\\{}()[\]^$+*?.]/g, '\\$&').replace(/-/g, '\\x2d'))
   }
-  return new RegExp(`(${content.join('|')})`, 'i')
+  return {
+    regex: new RegExp(`(${content.join('|')})`, 'ig'),
+    length: content.length
+  }
 }
 
 var replaceChar = charReplacer()
