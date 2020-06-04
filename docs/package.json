@@ -13,6 +13,6 @@
     "browserify": "^14.4.0",
     "budo": "^10.0.4",
     "lodash.debounce": "^4.0.8",
-    "simple-text-search": "^1.1.2"
+    "simple-text-search": "^1.1.4"
   }
 }
