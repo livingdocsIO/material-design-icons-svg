@@ -21,35 +21,31 @@
       }
 
       .panel {
-          margin-bottom: 3em;
-          border-radius: 2px;
-          background-color: #fff;
-          overflow: hidden;
-          box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+        margin-bottom: 3em;
+        border-radius: 2px;
+        background-color: #fff;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
       }
 
       .search {
-          display: block;
-          width: 100%;
-          outline: none;
-          font-size: 1.2em;
-          padding: 18px 22px;
-          box-sizing: border-box;
-          border: none;
-          line-height: 1.65em;
-      }
-
-      .icons {
-          font-size: 2.2em;
+        display: block;
+        font-size: 1.2em;
+        padding: 18px 22px;
+        box-sizing: border-box;
+        border: none;
+        line-height: 1.65em;
+        width: 100%;
       }
 
       .icon {
         width: 70px;
         height: 70px;
-        margin-bottom: 10px;
+        margin: 0 10px 0 0;
         display: none;
         text-align: center;
         transition: color 300ms;
+        position: relative;
       }
 
       .icon.show {
@@ -60,9 +56,6 @@
         color: rgb(4, 0, 128);
       }
 
-      .icon > * {
-        pointer-events: none;
-      }
 
       .icon svg {
         display: inline-block;
@@ -73,16 +66,25 @@
         padding: 0 15px;
       }
 
-      .icon input {
+      .icon p {
         display: block;
         width: 100%;
-        outline: none;
         border: 0;
         text-align: center;
-        margin-top: -13px;
         padding: 0;
         background: none;
         color: rgba(0, 0, 0, .6);
+        white-space: nowrap;
+        margin-top: -10px;
+        position: absolute;
+        overflow: hidden;
+        font-weight: 400;
+        font-size: 0.8em;
+        user-select: all;
+      }
+
+      .icon:hover p {
+        opacity: 1;
       }
     </style>
 </head>

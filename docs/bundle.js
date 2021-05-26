@@ -4,19 +4,25 @@ const iconNames = Object.keys(paths)
 const icons = require('../index')(paths, 'vendor-prefix')
 const debounce = require('lodash.debounce')
 
+
 function toIcon (name) {
-  return `
-    <div class="icon show" name="${name}">
+  const el = document.createElement('div')
+  el.innerHTML = `<div class="icon show" name="${name}">
       ${icons.getIcon(name, `title="${name}"`)}
-      <input type="text" value="${name}" autocorrect="false" spellcheck="false"/>
+      <p>${name}</p>
     </div>
   `
+  return el.firstChild
 }
 
-const body = `
-  ${iconNames.map(toIcon).join('')}
-  ${icons.getSymbols()}
-`
+const elements = []
+const withName = []
+for (const iconName in paths) {
+  withName.push({
+    name: iconName,
+    element: elements[elements.push(toIcon(iconName)) - 1]
+  })
+}
 
 function attach () {
   const search = document.createElement('div')
@@ -25,39 +31,19 @@ function attach () {
 
   const wrapper = document.createElement('div')
   wrapper.className = 'icons'
-  wrapper.innerHTML = body
+  wrapper.innerHTML = icons.getSymbols()
+  document.body.append(search, wrapper)
+  wrapper.append(...elements)
 
-  document.body.appendChild(search)
-  document.body.appendChild(wrapper)
-
-  const elements = [...wrapper.querySelectorAll('.icon')]
-  const entries = elements.map((e) => ({name: e.attributes.name.value, element: e}))
-  const iconSearch = require('simple-text-search')(entries, 'name')
-  let currentElements = iconSearch()
+  const iconSearch = require('simple-text-search')(withName, 'name')
   search.querySelector('input').addEventListener('keyup', debounce(function debouncedKeyUp (evt) {
     if (!evt.target.value) {
       for (const element of elements) element.classList.add('show')
     } else {
       for (const element of elements) element.classList.remove('show')
-      currentElements = [...iconSearch(evt.target.value)]
-      for (const entry of currentElements) entry.element.classList.add('show')
+      for (const entry of iconSearch(evt.target.value)) entry.element.classList.add('show')
     }
-  }), 100)
-
-  wrapper.addEventListener('click', function (evt) {
-    if (!evt.target || evt.target.className !== 'icon') return
-
-    const el = evt.target.querySelector('input')
-    const name = el.value
-    el.select()
-
-    try {
-      document.execCommand('copy')
-      console.log(`Copied the icon '${name}' into the clipboard`)
-    } catch (err) {
-      return console.error('Copy is not supported', err)
-    }
-  })
+  }, 300, {maxWait: 600}))
 }
 
 if (typeof window !== 'undefined') {
