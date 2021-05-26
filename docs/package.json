@@ -10,9 +10,9 @@
   "author": "Marc Bachmann <marc.brookman@gmail.com>",
   "license": "ISC",
   "dependencies": {
-    "browserify": "^14.4.0",
-    "budo": "^10.0.4",
+    "browserify": "^15.2.0",
+    "budo": "^11.6.4",
     "lodash.debounce": "^4.0.8",
-    "simple-text-search": "^1.1.4"
+    "simple-text-search": "^1.1.5"
   }
 }
