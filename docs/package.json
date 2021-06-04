@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "budo index.js:bundle.js",
-    "build": "browserify index.js > bundle.js"
+    "build": "browserify index.js > bundle.js && node savesvg.js"
   },
   "author": "Marc Bachmann <marc.brookman@gmail.com>",
   "license": "ISC",
