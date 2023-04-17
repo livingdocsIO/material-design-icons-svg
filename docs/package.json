@@ -11,7 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "browserify": "^15.2.0",
-    "budo": "^11.6.4",
+    "budo": "^11.8.4",
     "lodash.debounce": "^4.0.8",
     "simple-text-search": "^1.1.5"
   }
