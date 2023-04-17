@@ -1,7 +1,7 @@
 const paths = require('../paths')
 const iconNames = Object.keys(paths)
 const icons = require('../index')(paths, 'vendor-prefix')
-const debounce = require('lodash.debounce')
+const debounce = require('lodash/debounce')
 
 
 function toIcon (name) {
