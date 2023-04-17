@@ -1,56 +1,46 @@
-process.stdout.write('Downloading icons...')
-var interval = setInterval(function () { process.stdout.write('.') }, 500)
+process.stdout.write('Processing icons...')
+
+let interval = setInterval(function () { process.stdout.write('.') }, 500)
 process.on('exit', function () {
   process.stdout.write('\n')
   clearInterval(interval)
 })
 
-const writeFile = require('util').promisify(require('fs').writeFile)
-const https = require('https')
-const fs = require('fs')
+const fs = require('fs/promises')
 const join = require('path').join
 
-function getMdiApi(path, cb) {
-  return https.get({
-    host: 'materialdesignicons.com',
-    path: '/api' + path
-  }, function(response) {
-    var body = ''
-    response.on('data', function(d) {
-      body += d
-    })
-    response.on('end', function() {
-      var parsed
-      try {
-        parsed = JSON.parse(body)
-      } catch (e) {
-        console.error('Did not receive JSON:', body)
-        console.error(e)
-      }
-      cb(parsed)
-    })
-  })
+async function start () {
+  await fs.mkdir('./paths').catch((err) => { if (err.code !== 'EEXIST') throw err })
+
+  const dir = require.resolve('@mdi/svg/package.json').replace('package.json', 'svg')
+  const icons = await fs.readdir(dir)
+  for (const icon of icons) {
+    const _name = icon.replace('.svg', '')
+    const name = _name === 'package' ? 'package-regular' : _name
+
+    const sourceFile = join(dir, icon)
+    const source = await fs.readFile(sourceFile, 'utf8')
+    const path = source.match(/^<svg xmlns="http:\/\/www\.w3\.org\/2000\/svg" id="[^"]+" viewBox="0 0 24 24"><path d="([^"]+)" \/><\/svg>$/)?.[1]
+    if (!path) {
+      console.log('not matching pattern', icon, source)
+      continue
+    }
+    await fs.writeFile(join(__dirname, 'paths', `${name}.json`), `"${path}"`)
+  }
+
+  const files = await fs.readdir(join(__dirname, 'paths'))
+  const paths = await Promise.all(files.map(async (file) => {
+    const content = await fs.readFile(join(__dirname, 'paths', file), 'utf8')
+    return {
+      name: file.replace('.json', ''),
+      path: JSON.parse(content)
+    }
+  }))
+
+  const json = {}
+  for (const icon of paths) json[icon.name] = icon.path
+  await fs.writeFile(join(__dirname, 'paths.json'), JSON.stringify(json))
+  process.exit(0)
 }
 
-fs.mkdir('./paths', function (err) {
-  if (err && err.code !== 'EEXIST') throw err
-
-  getMdiApi('/init', function (init) {
-    var mainPackageId = init.packages[0].id
-    getMdiApi('/package/' + mainPackageId, function(data) {
-      var paths = data.icons.reduce(function (all, icon) {
-        if (icon.name === 'package') icon.name = 'package-regular'
-        all[icon.name] = icon.data
-        return all
-      }, {})
-
-      var json = JSON.stringify(paths)
-      fs.writeFile(join(__dirname, 'paths.json'), json, function (err) {
-        if (err) throw err
-
-        const promises = Object.keys(paths).map((icon) => writeFile(join(__dirname, 'paths', `${icon}.json`), `"${paths[icon]}"`))
-        Promise.all(promises).then(() => process.exit(0))
-      })
-    })
-  })
-})
+start()
