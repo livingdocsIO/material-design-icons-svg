@@ -10,7 +10,7 @@
   "author": "Marc Bachmann <marc.brookman@gmail.com>",
   "license": "ISC",
   "dependencies": {
-    "esbuild": "^0.17.17",
+    "esbuild": "^0.18.0",
     "lodash": "^4.17.21",
     "simple-text-search": "^1.1.5"
   }
