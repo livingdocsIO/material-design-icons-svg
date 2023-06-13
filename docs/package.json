@@ -9,8 +9,8 @@
   },
   "author": "Marc Bachmann <marc.brookman@gmail.com>",
   "license": "ISC",
-  "dependencies": {
-    "esbuild": "^0.17.17",
+  "devDependencies": {
+    "esbuild": "^0.18.2",
     "lodash": "^4.17.21",
     "simple-text-search": "^1.1.5"
   }
