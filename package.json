@@ -25,7 +25,7 @@
   },
   "homepage": "https://github.com/marcbachmann/material-design-icons-svg#readme",
   "devDependencies": {
-    "@mdi/svg": "^7.2.96"
+    "@mdi/svg": "^7.4.47"
   },
   "release": {
     "extends": "@livingdocs/semantic-release-presets/npm-github"
